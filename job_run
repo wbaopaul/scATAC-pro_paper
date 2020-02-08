@@ -1,0 +1,6 @@
+#!/bin/bash
+#$ -cwd
+#$ -j y
+#$ -pe smp 2
+#$ -l h_vmem=16G
+#$ -l mem_free=16G
