@@ -3,7 +3,6 @@ scATAC-pro_paper
 
 [![DOI](https://zenodo.org/badge/239170583.svg)](https://zenodo.org/badge/latestdoi/239170583)
 
-
 Data and scripts for manuscript "scATAC-pro: a comprehensive workbench for single-cell chromatin accessibility sequencing data"
 
 
