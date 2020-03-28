@@ -7,19 +7,19 @@ Data and scripts for manuscript "scATAC-pro: a comprehensive workbench for singl
 ## Scripts
 
 
-- prepData.R -- Script to download/generat and process simulated and real data
+- *prepData.R* - Script to download/generat and process simulated and real data
 
-- scripts/   -- Includes all scripts to process data, implement and evaluate different clustering methods
+- *scripts/*   - Includes all scripts to process data, implement and evaluate different clustering methods
 
-- runMethodDefaultSetting.R -- Perform clustering analysis given a dataset and clustering method (Fig S1A, S2A, S2B, S2D)
+- *runMethodDefaultSetting.R* - Perform clustering analysis given a dataset and clustering method (Fig S1A, S2A, S2B, S2D)
 
-- evalue_binarization.R  -- Study the effect of data binarization on clustering analysis (Fig S1B)
+- *evalue_binarization.R*  - Study the effect of data binarization on clustering analysis (Fig S1B)
 
-- runMethodDefaultSetting_differentComp.R -- Perform clustering analysis for simulated data vary in cell type composition (Fig S2C)
+- *runMethodDefaultSetting_differentComp.R* - Perform clustering analysis for simulated data vary in cell type composition (Fig S2C)
 
-- summarizeRes.R -- Summarize all intermediate results and plot figure (Fig S1, S2)
+- *summarizeRes.R* - Summarize all intermediate results and plot figure (Fig S1, S2)
 
-- compare2seurat_correct.R  -- Compare PCA implemented in Seurat and scATAC-pro (Fig S3)
+- *compare2seurat_correct.R*  - Compare PCA implemented in Seurat and scATAC-pro (Fig S3)
 
 
 ## Data
