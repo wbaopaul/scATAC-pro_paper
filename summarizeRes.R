@@ -1,7 +1,7 @@
 source('scripts/evalClusterMethods.R')
 library(RColorBrewer)
 
-## single run ####
+## part1: to plot rand index ####
 dtype = 'HSC_GSE96769'  ## resample10k_hsc/HSC_GSE96769/GSE74912_clean/GSE74912_noisy_q2/GSE74912_noisy_q2_q4
 mtx = readRDS(paste0('data/filtered_mat/', dtype, '_filtered_mat.rds'))
 cnames = colnames(mtx)
@@ -24,7 +24,7 @@ barplot(do.call('c', rands), col = set.cols, ylab = 'Adjust Rand', ylim = c(0, 1
 
 dev.off()
 
-## comapre time consuming ####
+## part2: comapre time consuming ####
 tt = fread('output/intermediate/resample10k_hsc/time4resample10k_hsc.txt')
 methods = c('seurat', 'seurat_correct', 'cisTopic', 'scABC', 'chromVAR', 'LSI', 'SCRAT')
 setkey(tt, V1)
@@ -36,7 +36,7 @@ set.cols = brewer.pal(n = length(tt$V2), name = 'Dark2')
 barplot(tt$V2, col = set.cols, ylab = 'Computational Time (s)', names.arg = tt$V1 )
 dev.off()
 
-## run with different composition -- Fig S2C ####
+## part3: summarize for study with different cell type composition -- Fig S2C ####
 dtype = 'resample10k_hsc'
 rands = list()
 methods = c('seurat', 'seurat_correct', 'cisTopic', 'scABC', 'chromVAR', 'LSI', 'SCRAT')

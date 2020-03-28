@@ -9,11 +9,6 @@ method = args[2]  ## clustering method
 kclusters = 13
 mtx = readRDS(paste0('data/filtered_matrix/', dtype, '_filtered_mat.rds'))
 
-if(grepl(dtype, pattern = 'GSE74912')) {
-  ## systhetic data to study binary vs non-binary
-  mtx = readRDS(paste0('output/intermediate/', dtype, '/', dtype, '.rds'))
-}
-
 if(grepl(dtype, pattern = 'HSC_GSE96769')) {
   kclusters = 10
 }

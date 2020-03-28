@@ -60,15 +60,15 @@ runSimpleComparison <- function(atac.mtx,
 ## part 1: Generating and using synthetic data from bulk matrix (GSE74912) with noisy ####
 ## comparison using different number of variable genes (Fig S1B)
 
-mtx.noisy2 <- readRDS('output/intermediate/GSE74912_noisy_q2/GSE74912_noisy_q2.rds')
+mtx.noisy2 <- readRDS('data/filtered_matrix/GSE74912_noisy_q2.rds')
 ctype = sapply(colnames(mtx.noisy2), function(x) unlist(strsplit(x, '_'))[1])
 rand.noisy2  = runSimpleComparison(mtx.noisy2, npc = 30, ctype = ctype)
 
-mtx.noisy4 <- readRDS('output/intermediate/GSE74912_noisy_q4/GSE74912_noisy_q4.rds')
+mtx.noisy4 <- readRDS('data/filtered_matrix/GSE74912_noisy_q4.rds')
 ctype = sapply(colnames(mtx.noisy4), function(x) unlist(strsplit(x, '_'))[1])
 rand.noisy4  = runSimpleComparison(mtx.noisy4, npc = 30, ctype = ctype)
 
-mtx.clean <- readRDS('output/intermediate/GSE74912_clean/GSE74912_clean.rds.rds')
+mtx.clean <- readRDS('data/filtered_matrix/GSE74912_clean.rds')
 ctype = sapply(colnames(mtx.clean), function(x) unlist(strsplit(x, '_'))[1])
 rand.clean  = runSimpleComparison(mtx.clean, npc = 30, ctype = ctype)
 

@@ -2,26 +2,7 @@ source('scripts/generateSimuData.R')
 source('scripts/implementClusterMethods.R')
 source('scripts/dataProcessing.R')
 
-## part1: resample data from blood cells, bulk ATAC of GSE74912 -- Fig S2 ####
-## the raw matrix was resampled from bam file and 
-## can be downloaded from: https://chopri.app.box.com/s/dlqybg6agug46obiu3mhevofnq4vit4t/
-## under peak_by_cell_matrices/suppl_fig2/resample10k_hsc_raw_mat.rds
-## suppose you saved the data in YOUR_PATH
-mtx = readRDS('YOUR_PATH/resample10k_hsc_raw_mat.rds')
-
-mtx.filter = filterMat(mtx, min_depth = 100)
-
-rnames = rownames(mtx.filter)
-mtx.filter = mtx.filter[grepl(rnames, pattern = '^chr'), ]
-cnames = colnames(mtx.filter)
-cnames = sapply(cnames, function(x) gsub('-', '_', x))
-names(cnames) <- NULL
-colnames(mtx.filter) <- cnames
-dir.create('data/filtered_matrix/')
-saveRDS(mtx.filter, 'data/filtered_matrix/resample10k_hsc_filtered_mat.rds')
-
-
-## part2: generate synthetic data with noise (GSE74912) -- Fig S1 ####
+## part1: generate synthetic data with noise (GSE74912) -- Fig S1 ####
 ## simulate from the bulk matrix
 meta = fread('data/raw/GSE74912/summarizedMeta.txt')  ## about all health samples
 ## download the GSE74912_ATACseq_ALL_Counts.txt from 
@@ -65,6 +46,27 @@ saveRDS(mtx.clean, file = 'data/filtered_matrix/GSE74912_clean/GSE74912_clean.rd
 saveRDS(mtx.noisy2, file = 'data/filtered_matrix/GSE74912_noisy_q2/GSE74912_noisy_q2.rds')
 saveRDS(mtx.noisy4, file = 'data/filtered_matrix/GSE74912_noisy_q4/GSE74912_noisy_q4.rds')
 
+
+## part2: resample data from blood cells, bulk ATAC of GSE74912 -- Fig S2 ####
+## the raw matrix was resampled from bam file and 
+## can be downloaded from: https://chopri.app.box.com/s/dlqybg6agug46obiu3mhevofnq4vit4t/
+## under peak_by_cell_matrices/suppl_fig2/resample10k_hsc_raw_mat.rds
+## suppose you saved the data in YOUR_PATH
+mtx = readRDS('YOUR_PATH/resample10k_hsc_raw_mat.rds')
+
+mtx.filter = filterMat(mtx, min_depth = 100)
+
+rnames = rownames(mtx.filter)
+mtx.filter = mtx.filter[grepl(rnames, pattern = '^chr'), ]
+cnames = colnames(mtx.filter)
+cnames = sapply(cnames, function(x) gsub('-', '_', x))
+names(cnames) <- NULL
+colnames(mtx.filter) <- cnames
+dir.create('data/filtered_matrix/')
+saveRDS(mtx.filter, 'data/filtered_matrix/resample10k_hsc_filtered_mat.rds')
+
+
+
 ## part3: prepare real data, GSE96769 -- Fig S2D ####
 atac.mtx = getRealData('HSC_GSE96769', 0.01, min_depth = 500)
 cn = colnames(atac.mtx)
@@ -79,7 +81,7 @@ ctype.merge = meta[colnames(atac.mtx)]$V2
 saveRDS(atac.mtx, file = 'data/filtered_matrix/HSC_GSE96769_filtered_mat.rds')
 saveRDS(ctype.merge, file = 'data/filtered_matrix/HSC_GSE96769_cell_type.rds')
 
-## prepare data for Fig S3 ####
+## part4: prepare real data for PBMC -- Fig S3 ####
 atac.mtx <- getRealData('PBMC10k', min_depth = 5000)
 saveRDS(atac.mtx, file = 'data/filtered_matrix/PBMC10k_filtered_mat.rds')
 
