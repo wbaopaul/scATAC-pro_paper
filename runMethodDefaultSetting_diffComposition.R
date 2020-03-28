@@ -10,7 +10,7 @@ method = args[1]  ## clustering method
 
 dtype = "resample10k_hsc"
 
-mtx = readRDS(paste0('data/filtered_mat/', dtype, '_filtered_mat.rds'))
+mtx = readRDS(paste0('data/filtered_matrix/', dtype, '_filtered_mat.rds'))
 kclusters = 13
 cnames = colnames(mtx)
 true.label = sapply(cnames, function(x) unlist(strsplit(x, '_'))[1])

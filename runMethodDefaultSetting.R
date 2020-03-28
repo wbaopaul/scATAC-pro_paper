@@ -7,7 +7,7 @@ dtype = args[1] ## key word for data name: one of HSC_GSE96769, resample10k_hsc,
 method = args[2]  ## clustering method
 
 kclusters = 13
-mtx = readRDS(paste0('data/filtered_mat/', dtype, '_filtered_mat.rds'))
+mtx = readRDS(paste0('data/filtered_matrix/', dtype, '_filtered_mat.rds'))
 
 if(grepl(dtype, pattern = 'GSE74912')) {
   ## systhetic data to study binary vs non-binary

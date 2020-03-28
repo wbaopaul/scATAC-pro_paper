@@ -1,10 +1,5 @@
 source('scDataAnalysis_Utilities.R')
 
-dir0 = '/mnt/isilon/tan_lab/yuw1/R_work_dir/scMethod/Public_Data/pbmc_10xgenomics/scATAC_filtered_peak_bc_matrix/'
-
-
-
-
 mtx1 = readRDS('data/filtered_matrix/PBMC10k_filtered_mat.rds')
 args = commandArgs(T)
 
