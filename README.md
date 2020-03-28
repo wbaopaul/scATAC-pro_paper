@@ -1,4 +1,4 @@
-scATAC-pro_study
+scATAC-pro_paper
 -----------------
 
 [![DOI](https://zenodo.org/badge/239170583.svg)](https://zenodo.org/badge/latestdoi/239170583)
