@@ -3,29 +3,21 @@
 source('scripts/implementClusterMethods.R')
 
 args = commandArgs(T)
-dtype = args[1] ## key word for dataname
-method = args[2]  ## method
+dtype = args[1] ## key word for data name: one of HSC_GSE96769, resample10k_hsc,  GSE74912_clean, GSE74912_noisy_q2, GSE74912_noisy_q2_q4
+method = args[2]  ## clustering method
 
-kclusters = 5
-if(dtype == 'simuData') mtx = readRDS('data/intermediate/Filtered_mat/PBMC10k_simuData.rds')$mtx
-if(dtype == 'simuData_hard') mtx = readRDS('data/intermediate/Filtered_mat/PBMC10k_simuData_hard.rds')$mtx
-if(grepl(dtype, pattern = 'resample.+hsc')) {
-    mtx = readRDS(paste0('data/intermediate/Filtered_mat/', dtype, '_filtered_mat.rds'))
-    kclusters = 13
+kclusters = 13
+mtx = readRDS(paste0('data/filtered_mat/', dtype, '_filtered_mat.rds'))
+
+if(grepl(dtype, pattern = 'GSE74912')) {
+  ## systhetic data to study binary vs non-binary
+  mtx = readRDS(paste0('output/intermediate/', dtype, '/', dtype, '.rds'))
 }
 
 if(grepl(dtype, pattern = 'HSC_GSE96769')) {
-  mtx = readRDS(paste0('data/intermediate/Filtered_mat/', dtype, '_filtered_mat.rds'))
   kclusters = 10
 }
-if(grepl(dtype, pattern = 'bonemarrow')) {
-  mtx = readRDS(paste0('data/raw/GSE96771/', dtype, '.rds'))
-  kclusters = 6
-}
-if(grepl(dtype, pattern = 'erythropoiesis')) {
-  mtx = readRDS(paste0('data/raw/GSE96771/', dtype, '.rds'))
-  kclusters = 12
-}
+
 mtx = 1 * mtx
 
 stime = Sys.time()
@@ -34,14 +26,16 @@ if(method == 'monocle3') res = run_monocle3(mtx)
 if(method == 'sc3') res = run_sc3(mtx, k = kclusters)
 if(method == 'cisTopic') res = run_cisTopic(mtx)
 if(method == 'chromVAR'){
-   res = run_chromVAR(mtx, 'BSgenome.Hsapiens.UCSC.hg19')
-   #res = run_chromVAR(mtx, 'BSgenome.Mmusculus.UCSC.mm9')
-  
+   gname =  'BSgenome.Hsapiens.UCSC.hg19'
+   res = run_chromVAR(mtx, gname)
 }
 
-if(method == 'seurat') res = doBasicSeurate(mtx)
-if(method == 'seurat_correct') res = doBasicSeurat_new(mtx, 
-                                                       top_variable_features = 20000)
+## note to change top_variable_features when differnt # of variable genes was needed
+if(method == 'seurat') res = doBasicSeurat(mtx, 5000)
+if(method == 'seurat_correct') {
+  res = doBasicSeurat_new(mtx, top_variable_features = 5000) 
+}
+
 if(method == 'scABC') res = run_scABC(mtx, k = kclusters)
 if(method == 'LSI') res = run_LSI(mtx, k = kclusters)
 if(method == 'SCRAT') res = run_scrat(mtx, k = kclusters)
@@ -49,9 +43,13 @@ if(method == 'SCRAT') res = run_scrat(mtx, k = kclusters)
 etime = Sys.time()
 etime - stime
 
+## save result
+dir.create(paste0('output/intermediate/', dtype), showWarnings = F)
+
 write(paste(method, as.numeric(etime - stime, units = 'secs')), 
-      file = paste0('data/intermediate/', dtype, '/time4', dtype, '.txt'),
+      file = paste0('output/intermediate/', dtype, '/time4', dtype, '.txt'),
       append = T)
 
-saveRDS(res, paste0('data/intermediate/', dtype, '/res4', method, '_', dtype, '.rds'))
+
+saveRDS(res, paste0('output/intermediate/', dtype, '/res4', method, '_', dtype, '.rds'))
 

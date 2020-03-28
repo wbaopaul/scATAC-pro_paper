@@ -16,7 +16,7 @@ library(Rtsne)
 library(Seurat)
 library(DropletUtils)
 library(cisTopic)
-#library(scABC)
+library(scABC)
 
 library(monocle)
 suppressMessages(library(flexclust))
@@ -25,9 +25,6 @@ suppressMessages(library(mcclust))
 #import("louvain")
 
 library(SC3)
-
-library(reticulate)
-use_python('/mnt/isilon/tan_lab/yuw1/local_tools/anaconda3/bin/python')
 
 doDimReduction4mat <- function(mtx, max_pc = 20, doTSNE = F){
   ## DO SVD on tf_idf normalized matrix                             
@@ -55,7 +52,7 @@ doDimReduction4mat <- function(mtx, max_pc = 20, doTSNE = F){
 
 ## implement of scRNA-seq specific methods ####
 # do normalization, pca using Seurat, with default setting
-doBasicSeurate <- function(mtx, npc = 50, top.variable = NULL,
+doBasicSeurat <- function(mtx, npc = 50, top_variable_features = 5000,
                            doScale = T, doCenter = T, doLog = T, assay = 'ATAC', 
                            regr.var = 'nCount_ATAC'){
   
@@ -65,10 +62,10 @@ doBasicSeurate <- function(mtx, npc = 50, top.variable = NULL,
                                   names.delim = '-', min.cells = 10, min.features = 10)
   cell.names = colnames(mtx)
   
+  nveg = ifelse(top_variable_features > 1, top_variable_features, floor(nrow(mtx) * top_variable_features))
   
   seurat.obj <- FindVariableFeatures(object = seurat.obj, 
-                                     nfeatures = ifelse(is.null(top.variable), 5000, 
-                                                        floor(nrow(mtx) * top.variable)))
+                                     nfeatures = nveg)
   seurat.obj <- ScaleData(object = seurat.obj, 
                           features = VariableFeatures(seurat.obj), 
                           vars.to.regress = regr.var, do.scale = doScale, do.center = doCenter)
@@ -81,7 +78,7 @@ doBasicSeurate <- function(mtx, npc = 50, top.variable = NULL,
   
   return(seurat.obj)
 }
-doBasicSeurate = cmpfun(doBasicSeurate)
+doBasicSeurat = cmpfun(doBasicSeurat)
 
 
 regress_on_pca <- function(seurat.obj, reg.var = 'nCount_ATAC'){
@@ -216,7 +213,7 @@ queryResolution4Seurat = cmpfun(queryResolution4Seurat)
 # do clustering using different #pcs and different methods, given an seurat.obj
 ## return seurat object, with a new meta.data column with name clusterLabelName
 ## gcSNN -- the clustering method used by seurat (Louvain algorithm on snn)
-clust4seurat <- function(seurat.obj, npc = 30, method = 'gcSNN', reduction = 'tsne', resolution = 0.1, 
+clust4seurat <- function(seurat.obj, npc = 30, method = 'gcSNN', reduction = 'tsne', resolution = 0.05, 
                          clustLabelName = paste0('clusterBy_', reduction, '_',  method), k = NULL){
   
   ## note the seurat object was done pca using 100 pcs; so npc should be smaller than 100
@@ -347,7 +344,7 @@ run_sc3 <- function(mtx, k = 5){
 }
 
 
-## run monocle3
+## run monocle3 --not used
 run_monocle3 <- function(mtx, nFeatures = 10000){
   pd = data.frame('cellID' = 1:ncol(mtx))
   row.names(pd) = colnames(mtx)
@@ -447,6 +444,9 @@ run_chromVAR <- function(mtx, genomeName = 'BSgenome.Hsapiens.UCSC.hg19'){
 
 
 run_LSI <- function(mtx, ncell.peak = 150,  max_pc = 10, k = 5){
+  ## if the numbe of features > 100k, select most variable 100k features
+  sds = sapply(1:nrow(mtx), function(x) sd(mtx[x, ]))
+  
   mtx = (mtx > 0)
   mtx = 1 * mtx
   
@@ -466,15 +466,7 @@ run_LSI <- function(mtx, ncell.peak = 150,  max_pc = 10, k = 5){
   rownames(SVDtsne_vd) = colnames(mtx)
   colnames(SVDtsne_vd) = paste0('pca_', 1:ncol(SVDtsne_vd))
   
-  ## Run TSNE to 2 dimensions
-  if(F){
-    tsnetfidf = Rtsne(SVDtsne_vd, pca=F, perplexity=30, max_iter=5000)
-    
-    tsne_coords = as.data.frame(tsnetfidf$Y)
-    colnames(tsne_coords) = c('tsne_1', 'tsne_2')
-    rownames(tsne_coords) = colnames(ncounts) 
-  }
-   
+
   pca_coords = SVDtsne_vd[, 2:max_pc]
   cl.labels = generalCluster(pca_coords, k = k, method = 'hclust')
   return(cl.labels)

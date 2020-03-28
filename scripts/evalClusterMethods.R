@@ -13,7 +13,7 @@ sumMethods4default <- function(true.label, dtype = 'simuData',
   rands = list()
   k = length(unique(true.label))
   for(method0 in methods){
-    obj = readRDS(paste0('data/intermediate/', dtype, '/res4', method0, '_', dtype, '.rds'))
+    obj = readRDS(paste0('output/intermediate/', dtype, '/res4', method0, '_', dtype, '.rds'))
     if(grepl(method0, pattern = 'seurat', ignore.case = T)){
       # load seurat object
       obj = clust4seurat(obj, reduction = 'pca', k = k)
@@ -40,7 +40,7 @@ sumMethods4default <- function(true.label, dtype = 'simuData',
     }
     
     if(method0 == 'cisTopic'){
-      sele.cisTopic <- selectModel(obj, 
+      sele.cisTopic <- cisTopic::selectModel(obj, 
                                    keepBinaryMatrix = F, keepModels = F)
       cell_topic <- t(modelMatSelection(sele.cisTopic, 'cell', 'Probability'))
       pred.labels[[method0]] <- generalCluster(cell_topic, method = 'hclust', 
@@ -69,7 +69,7 @@ sumMethods4default <- function(true.label, dtype = 'simuData',
 
 updateSummary <- function(true.label, dtype, method0, rands, pred.labels){
   k = length(unique(true.label))
-  obj = readRDS(paste0('data/intermediate/', dtype, '/res4', method0, '_', dtype, '.rds'))
+  obj = readRDS(paste0('output/intermediate/', dtype, '/res4', method0, '_', dtype, '.rds'))
   if(grepl(method0, pattern = 'seurat', ignore.case = T)){
     # load seurat object
     obj = clust4seurat(obj, reduction = 'pca', k = k)
@@ -96,7 +96,7 @@ updateSummary <- function(true.label, dtype, method0, rands, pred.labels){
   }
   
   if(method0 == 'cisTopic'){
-    sele.cisTopic <- selectModel(obj, 
+    sele.cisTopic <- cisTopic::selectModel(obj, 
                                  keepBinaryMatrix = F, keepModels = F)
     cell_topic <- t(modelMatSelection(sele.cisTopic, 'cell', 'Probability'))
     pred.labels[[method0]] <- generalCluster(cell_topic, method = 'hclust', 

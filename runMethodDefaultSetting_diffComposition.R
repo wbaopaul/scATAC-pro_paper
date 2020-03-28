@@ -5,24 +5,16 @@ source('scripts/implementClusterMethods.R')
 source('scripts/evalClusterMethods.R')
 source('scripts/dataProcessing.R')
 args = commandArgs(T)
-dtype = args[1] ## simuData
-method = args[2]  ## method
 
+method = args[1]  ## clustering method
 
-if(dtype %in% c('simuData', 'simuData_hard')) {
-  mtx = readRDS(paste0('data/intermediate/Filtered_mat/PBMC10k_', dtype, '.rds'))
-  true.label = mtx$cluster_labels$Group
-  mtx = mtx$mtx
-  cnames = colnames(mtx)
-  kclusters = 5
-}
+dtype = "resample10k_hsc"
 
-if(grepl(dtype, pattern = 'resample')) {
-  mtx = readRDS(paste0('data/intermediate/Filtered_mat/', dtype, '_filtered_mat.rds'))
-  kclusters = 13
-  cnames = colnames(mtx)
-  true.label = sapply(cnames, function(x) unlist(strsplit(x, '-'))[1])
-}
+mtx = readRDS(paste0('data/filtered_mat/', dtype, '_filtered_mat.rds'))
+kclusters = 13
+cnames = colnames(mtx)
+true.label = sapply(cnames, function(x) unlist(strsplit(x, '_'))[1])
+
 mtx = 1 * mtx
 
 stime = Sys.time()
@@ -51,7 +43,8 @@ for(i in 1:nrow(props)){
     res = run_chromVAR(mtx.sele, 'BSgenome.Hsapiens.UCSC.hg19')
   }
   if(method == 'seurat') res = doBasicSeurate(mtx.sele)
-  if(method == 'seurat_correct') res = doBasicSeurat_new(mtx.sele)
+  if(method == 'seurat_correct') res = doBasicSeurat_new(mtx.sele,
+                                                         top_variable_features = 20000)
   if(method == 'scABC') res = run_scABC(mtx.sele, k = kclusters)
   if(method == 'LSI') res = run_LSI(mtx.sele, k = kclusters)
   if(method == 'SCRAT') res = run_scrat(mtx.sele, k = kclusters)
@@ -61,11 +54,15 @@ for(i in 1:nrow(props)){
 
 etime = Sys.time()
 etime - stime
+
+dir.create(paste0('output/intermediate/', dtype), showWarnings = F)
+
 write(paste(method, as.numeric(etime - stime, units = 'secs')), 
-      file = paste0('data/intermediate/', dtype, '/time4', dtype, '_diffComposition.txt'),
+      file = paste0('output/intermediate/', dtype, '/time4', dtype, '_diffComposition.txt'),
       append = T)
 
+dir.create('output/intermediate/randIndexs', showWarnings = F)
 
-write.table(rands, file = paste0('data/intermediate/randIndexs/', 'rand4', method, '_', dtype, '.txt'),
+write.table(rands, file = paste0('output/intermediate/randIndexs/', 'rand4', method, '_', dtype, '.txt'),
             row.names = F, quote = F, col.names = F, sep = '\t')
 
